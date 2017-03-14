@@ -56,6 +56,8 @@ class RocketMap:
             'atk': check_for_none(int, data.get('individual_attack'), '?'),
             'def': check_for_none(int, data.get('individual_defense'), '?'),
             'sta': check_for_none(int, data.get('individual_stamina'), '?'),
+            'cp': check_for_none(int, data.get('cp'), '?'), #rightintheh
+            'level': check_for_none(int, data.get('level'), '?'), #rightintheh
             'quick_id': quick_id,
             'quick_damage': get_move_damage(quick_id),
             'quick_dps': get_move_dps(quick_id),

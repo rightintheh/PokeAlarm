@@ -45,6 +45,8 @@ def load_pokemon_section(settings):
         "min_atk": 0, "max_atk": 15,
         "min_def": 0, "max_def": 15,
         "min_sta": 0, "max_sta": 15,
+        "min_cp": 0, "max_cp": 10000, #RightIntheH
+        "min_level": 0, "max_level": 40, #RightIntheH
         "quick_move": None, "charge_move": None, "moveset": None,
         "size": None
     }, 'default')
@@ -144,6 +146,12 @@ class PokemonFilter(Filter):
         self.max_def = int(settings.pop('max_def', None) or default['max_def'])
         self.min_sta = int(settings.pop('min_sta', None) or default['min_sta'])
         self.max_sta = int(settings.pop('max_sta', None) or default['max_sta'])
+        # CP Rightintheh
+        self.min_cp = float(settings.pop('min_cp', None) or default['min_cp'])
+        self.max_cp = float(settings.pop('max_cp', None) or default['max_cp'])
+        # Level rightintheh
+        self.min_level = float(settings.pop('min_level', None) or default['min_level'])
+        self.max_level = float(settings.pop('max_level', None) or default['max_level'])
         # Size
         self.sizes = PokemonFilter.check_sizes(settings.pop("size", default['size']))
         # Moves - These can't be set in the default filter
@@ -172,6 +180,14 @@ class PokemonFilter(Filter):
     # Checks the stamina IV against this filter
     def check_sta(self, sta):
         return self.min_sta <= sta <= self.max_sta
+
+    # Checks the CP percent against this filter RightintheH
+    def check_cp(self, dist):
+        return self.min_cp <= dist <= self.max_cp
+
+    # Checks the Level percent against this filter RightintheH
+    def check_level(self, dist):
+        return self.min_level <= dist <= self.max_level
 
     # Checks the quick move against this filter
     def check_quick_move(self, move_id):
@@ -208,19 +224,23 @@ class PokemonFilter(Filter):
             "min_atk": self.min_atk, "max_atk": self.max_atk,
             "min_def": self.min_def, "max_def": self.max_def,
             "min_sta": self.min_sta, "max_sta": self.max_sta,
+            "min_cp": self.min_cp, "max_cp": self.max_cp, #RightIntheH
+            "min_level": self.min_level, "max_level": self.max_level, #RightIntheH
             "quick_move": self.req_quick_move, "charge_move": self.req_charge_move,
             "moveset": self.req_moveset,
             "size": self.sizes,
             "ignore_missing": self.ignore_missing
         }
 
-    # Print this filter
+    # Print this filter (RightInTheH added Level and CP)
     def to_string(self):
         return "Dist: {} to {}, ".format(self.min_dist, self.max_dist) + \
                "IV%: {} to {}, ".format(self.min_iv, self.max_iv) +  \
                "Atk: {} to {}, ".format(self.min_atk, self.max_atk) + \
                "Def: {} to {}, ".format(self.min_def, self.max_def) + \
                "Sta: {} to {}, ".format(self.min_sta, self.max_sta) +\
+               "CP: {} to {}, ".format(self.min_cp, self.max_cp) +  \
+               "Level: {} to {}, ".format(self.min_level, self.max_level) +  \
                "Quick Moves: {}, ".format(self.req_quick_move) + \
                "Charge Moves: {}, ".format(self.req_charge_move) + \
                "Move Sets: {}, ".format(self.req_moveset)  +\

@@ -332,6 +332,8 @@ class Manager(object):
         quick_id = pkmn['quick_id']
         charge_id = pkmn['charge_id']
         size = pkmn['size']
+        cp = pkmn['cp'] #RightInTheH
+        level = pkmn['level'] #RightInTheH
 
         filters = self.__pokemon_settings['filters'][pkmn_id]
         for filt_ct in range(len(filters)):
@@ -398,6 +400,32 @@ class Manager(object):
                     log.info("{} rejected: Stamina IV information was missing - (F #{})".format(name, filt_ct))
                     continue
                 log.debug("Pokemon 'sta' was not checked because it was missing.")
+
+            # Check the CP of the Pokemon RightInTheH
+            if cp != '?':
+                if not filt.check_cp(cp):
+                    if self.__quiet is False:
+                        log.info("{} rejected: CP percent ({:.0f}) not in range {:.0f} to {:.0f} - (F #{})".format(
+                            name, cp, filt.min_cp, filt.max_cp, filt_ct))
+                    continue
+            else:
+                if filt.ignore_missing is True:
+                    log.info("{} rejected: 'CP' information was missing (F #{})".format(name, filt_ct))
+                    continue
+                log.debug("Pokemon CP percent was not checked because it was missing.")
+
+            # Check the Level of the Pokemon RightInTheH
+            if level != '?':
+                if not filt.check_level(level):
+                    if self.__quiet is False:
+                        log.info("{} rejected: Level percent ({:.0f}) not in range {:.0f} to {:.0f} - (F #{})".format(
+                            name, Level, filt.min_level, filt.max_level, filt_ct))
+                    continue
+            else:
+                if filt.ignore_missing is True:
+                    log.info("{} rejected: 'Level' information was missing (F #{})".format(name, filt_ct))
+                    continue
+                log.debug("Pokemon Level percent was not checked because it was missing.")
 
             # Check the Quick Move of the Pokemon
             if quick_id != '?':
@@ -475,7 +503,9 @@ class Manager(object):
             'iv': "{:.1f}".format(iv) if iv != '?' else '?',
             'iv_2': "{:.2f}".format(iv) if iv != '?' else '?',
             'quick_move': self.__move_name.get(quick_id, 'unknown'),
-            'charge_move': self.__move_name.get(charge_id, 'unknown')
+            'charge_move': self.__move_name.get(charge_id, 'unknown'),
+            'cp' : "{:.0f}".format(cp) if cp != '?' else '?', #rightintheh
+            'level' : "{:.0f}".format(level) if level != '?' else '?' #rightintheh
         })
         self.add_optional_travel_arguments(pkmn)
 
@@ -744,9 +774,9 @@ class Manager(object):
     def reverse_location(self, lat, lng):
         # Set defaults in case something goes wrong
         details = {
-            'street_num': 'unkn', 'street': 'unknown', 'address': 'unknown', 'postal': 'unknown',
-            'neighborhood': 'unknown', 'sublocality': 'unknown', 'city': 'unknown',
-            'county': 'unknown', 'state': 'unknown', 'country': 'country'
+            'street_num': 'N/A', 'street': 'N/A', 'address': 'N/A', 'postal': 'N/A',
+            'neighborhood': 'N/A', 'sublocality': 'N/A', 'city': 'N/A',
+            'county': 'N/A', 'state': 'N/A', 'country': 'country'
         }
         if self.__gmaps_client is None:  # Check if key was provided
             log.error("No Google Maps API key provided - unable to reverse geocode.")
@@ -757,16 +787,16 @@ class Manager(object):
             for item in result['address_components']:
                 for category in item['types']:
                     loc[category] = item['short_name']
-            details['street_num'] = loc.get('street_number', 'unkn')
-            details['street'] = loc.get('route', 'unkn')
+            details['street_num'] = loc.get('street_number', 'N/A')
+            details['street'] = loc.get('route', 'N/A')
             details['address'] = "{} {}".format(details['street_num'], details['street'])
-            details['postal'] = loc.get('postal_code', 'unkn')
-            details['neighborhood'] = loc.get('neighborhood', "unknown")
-            details['sublocality'] = loc.get('sublocality', "unknown")
-            details['city'] = loc.get('locality', loc.get('postal_town', 'unknown'))
-            details['county'] = loc.get('administrative_area_level_2', 'unknown')
-            details['state'] = loc.get('administrative_area_level_1', 'unknown')
-            details['country'] = loc.get('country', 'unknown')
+            details['postal'] = loc.get('postal_code', 'N/A')
+            details['neighborhood'] = loc.get('neighborhood', "N/A")
+            details['sublocality'] = loc.get('sublocality', "N/A")
+            details['city'] = loc.get('locality', loc.get('postal_town', 'N/A'))
+            details['county'] = loc.get('administrative_area_level_2', 'N/A')
+            details['state'] = loc.get('administrative_area_level_1', 'N/A')
+            details['country'] = loc.get('country', 'N/A')
         except Exception as e:
             log.error("Encountered error while getting reverse location data ({}: {})".format(type(e).__name__, e))
             log.debug("Stack trace: \n {}".format(traceback.format_exc()))

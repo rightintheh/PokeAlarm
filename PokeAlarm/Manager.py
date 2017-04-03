@@ -419,7 +419,7 @@ class Manager(object):
                 if not filt.check_level(level):
                     if self.__quiet is False:
                         log.info("{} rejected: Level percent ({:.0f}) not in range {:.0f} to {:.0f} - (F #{})".format(
-                            name, Level, filt.min_level, filt.max_level, filt_ct))
+                            name, level, filt.min_level, filt.max_level, filt_ct))
                     continue
             else:
                 if filt.ignore_missing is True:
